@@ -1,15 +1,15 @@
 # TinyServer
 ### This is a tiny HTTP server written in Python
 
-It provides minimal HTTP server to serve simple HTML pages
+It provides minimal HTTP server to serve simple HTML pages . Easy and simple .
 
 ## Screenshots
-TinyServer in action
+Using tinyserver is just as easy as it looks.
 ![alt text](img/tiny_term.png)
 
 ![alt text](img/tinyindex.png)
 
-Default 404 Page
+Default 404 Page.
 ![alt text](img/tiny_404.png)
 
 ## Usage
