@@ -22,12 +22,12 @@ class TCPServer():
             conn, addr = self.server_socket.accept()
             data =  conn.recv(1024)
 
-            response = self.request_handler(data)
-            conn.sendall(response)
+            response = self.handle_request(data)
+            conn.sendall(response.encode())
             conn.close()
 
-    def request_handler(self, data):
+    def handle_request(self, data):
         """Incoming Ruquest handler. For generating response
         Override this in the HTTPServer subclass"""
 
-        return b"Empty Response"
+        return "Empty Response"

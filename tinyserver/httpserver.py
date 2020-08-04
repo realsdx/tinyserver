@@ -1,4 +1,4 @@
-from tcpserver import TCPServer
+from .tcpserver import TCPServer
 import os
 import mimetypes
 
@@ -10,6 +10,7 @@ class HTTPRequest():
         self.http_version = 'HTTP/1.1'
         self.headers = {}
 
+        data = data.decode()
         self.parse(data)
 
     def parse(self, data):
@@ -35,7 +36,8 @@ class HTTPServer(TCPServer):
 
     headers = {
         'Server': 'Tiny Server',
-        'ContentType': 'text/html'
+        'ContentType': 'text/html',
+        'Connection': 'close'
     }
 
     def response_status_line(self, status_code):
@@ -49,7 +51,7 @@ class HTTPServer(TCPServer):
 
         headers = ""
         for h in headers_copy:
-            headers += "%s: %s\r\n" % (h, self.headers[h])
+            headers += "%s: %s\r\n" % (h, headers_copy[h])
         return headers
 
     def handle_request(self, data):
@@ -72,10 +74,14 @@ class HTTPServer(TCPServer):
             extra_headers = {'Content-Type': content_type}
             response_headers = self.response_headers(extra_headers)
 
-            with open(filename) as f:
-                response_body = f.read()
+            with open(filename, 'rb') as f:
+                file_data =  f.read()
+                if content_type == "text/html":
+                    response_body = file_data.decode()
+                else:
+                    response_body = file_data
         else:
-            response_line = self.response_line(404)
+            response_status_line = self.response_status_line(404)
             response_headers = self.response_headers()
             response_body = "<h1>404 Not Found</h1>"
 
@@ -97,4 +103,3 @@ class HTTPServer(TCPServer):
         )
 
         return response
-
