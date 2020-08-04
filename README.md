@@ -5,12 +5,12 @@ It provides minimal HTTP server to serve simple HTML pages
 
 ## Screenshots
 TinyServer in action
-![alt text](img/tiny_term.png)
+![alt text](.github/img/tiny_term.png)
 
-![alt text](img/tinyindex.png)
+![alt text](.github/img/tinyindex.png)
 
 Default 404 Page
-![alt text](img/tiny_404.png)
+![alt text](.github/img/tiny_404.png)
 
 ## Usage
 It serves HTML pages.
