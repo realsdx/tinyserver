@@ -31,8 +31,10 @@ class HTTPRequest():
 
 class HTTPServer(TCPServer):
     status_codes = {200: 'OK', 404: 'Not Found', 501: 'Not Implemented'}
-
     headers = {'Server': 'Tiny Server', 'Connection': 'close'}
+
+    def __init__(self, host='127.0.0.1', port=5000):
+        super().__init__(host, port)
 
     def response_status_line(self, status_code):
         status_text = self.status_codes[status_code]
