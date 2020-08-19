@@ -2,6 +2,8 @@ from .tcpserver import TCPServer
 import os
 import mimetypes
 
+WEB_DIR = 'html/'
+
 
 class HTTPRequest():
     def __init__(self, data):
@@ -62,12 +64,13 @@ class HTTPServer(TCPServer):
 
     def handle_GET(self, request):
         filename = request.URI.strip('/')
+        filepath = os.path.abspath(WEB_DIR+filename)
 
-        if os.path.exists(filename):
+        if os.path.exists(filepath):
             status_line = self.response_status_line(200)
-            content_type = mimetypes.guess_type(filename)[0] or 'text/html'
+            content_type = mimetypes.guess_type(filepath)[0] or 'text/html'
 
-            with open(filename, 'rb') as f:
+            with open(filepath, 'rb') as f:
                 file_data = f.read()
                 if content_type == "text/html":
                     body = file_data.decode().encode(
