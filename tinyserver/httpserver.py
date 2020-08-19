@@ -28,17 +28,9 @@ class HTTPRequest():
 
 
 class HTTPServer(TCPServer):
-    status_codes = {
-        200: 'OK',
-        404: 'Not Found',
-        501: 'Not Implemented'
-    }
+    status_codes = {200: 'OK', 404: 'Not Found', 501: 'Not Implemented'}
 
-    headers = {
-        'Server': 'Tiny Server',
-        'ContentType': 'text/html',
-        'Connection': 'close'
-    }
+    headers = {'Server': 'Tiny Server', 'Connection': 'close'}
 
     def response_status_line(self, status_code):
         status_text = self.status_codes[status_code]
@@ -52,54 +44,52 @@ class HTTPServer(TCPServer):
         headers = ""
         for h in headers_copy:
             headers += "%s: %s\r\n" % (h, headers_copy[h])
+
+        # append body separator '\r\n'
+        headers += "\r\n"
         return headers
 
-    def handle_request(self, data):
-        request =  HTTPRequest(data)
+    def handle_request(self, data, connection_socket):
+        request = HTTPRequest(data)
         try:
             handler = getattr(self, 'handle_%s' % request.method)
         except AttributeError:
             print("Not Implemented")
-        response = handler(request)
-
-        return response
+        status_line, headers, body = handler(request)
+        connection_socket.sendall(status_line)
+        connection_socket.sendall(headers)
+        if body: connection_socket.sendall(body)
 
     def handle_GET(self, request):
         filename = request.URI.strip('/')
 
         if os.path.exists(filename):
-            response_status_line = self.response_status_line(200)
+            status_line = self.response_status_line(200)
             content_type = mimetypes.guess_type(filename)[0] or 'text/html'
 
-            extra_headers = {'Content-Type': content_type}
-            response_headers = self.response_headers(extra_headers)
-
             with open(filename, 'rb') as f:
-                file_data =  f.read()
+                file_data = f.read()
                 if content_type == "text/html":
-                    response_body = file_data.decode()
+                    body = file_data.decode().encode(
+                        'utf-8')  # decode from binary, encode to utf-8
                 else:
-                    response_body = file_data
-        else:
-            response_status_line = self.response_status_line(404)
-            response_headers = self.response_headers()
-            response_body = "<h1>404 Not Found</h1>"
+                    body = file_data
 
-        response = "%s%s\r\n%s" % (
-            response_status_line, 
-            response_headers, 
-            response_body
-        )
-        return response
+            extra_headers = {
+                'Content-Type': content_type,
+                'Content-Length': len(body)
+            }
+            headers = self.response_headers(extra_headers)
+        else:
+            status_line = self.response_status_line(404)
+            headers = self.response_headers()
+            body = "<h1>404 Not Found</h1>".encode()
+
+        return status_line.encode(), headers.encode(), body
 
     def handle_OPTIONS(self, request):
-        resonse_status_line = self.response_status_line(200)
-        allow_header = {'Allow':'OPTIONS, GET'}
+        status_line = self.response_status_line(200)
+        allow_header = {'Allow': 'OPTIONS, GET'}
         headers = self.response_headers(allow_header)
 
-        response = "%s%s\r\n" % (
-            resonse_status_line,
-            headers
-        )
-
-        return response
+        return status_line.encode(), headers.encode(), None

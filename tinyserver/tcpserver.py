@@ -1,7 +1,7 @@
 import socket
 
-
 REQUEST_QUEUE_SIZE = 1
+
 
 class TCPServer():
     def __init__(self, host='127.0.0.1', port=5000):
@@ -19,14 +19,13 @@ class TCPServer():
         print("Started server at ", self.server_socket.getsockname())
 
         while True:
-            conn, addr = self.server_socket.accept()
-            data =  conn.recv(1024)
+            connection_socket, addr = self.server_socket.accept()
+            data = connection_socket.recv(2048)
 
-            response = self.handle_request(data)
-            conn.sendall(response.encode())
-            conn.close()
+            self.handle_request(data, connection_socket)
+            connection_socket.close()
 
-    def handle_request(self, data):
+    def handle_request(self, data, connection_socket):
         """Incoming Ruquest handler. For generating response
         Override this in the HTTPServer subclass"""
 
