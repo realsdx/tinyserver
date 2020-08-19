@@ -20,11 +20,11 @@ If no specified filename is given in URL then it will serve `index.html`.
 
 Start the server in specified port.
 ```python
-python tiny.py 8888
+python main.py 8888
 ```
 Start the server in default port 5000
 ```python
-python tiny.py
+python main.py
 ```
 
 ### I made this to learn about HTTP Servers.
