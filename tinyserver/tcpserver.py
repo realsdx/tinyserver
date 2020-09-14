@@ -1,5 +1,7 @@
 import socket
 
+from threading import Thread
+
 REQUEST_QUEUE_SIZE = 5
 
 
@@ -7,6 +9,7 @@ class TCPServer():
     def __init__(self, host='127.0.0.1', port=5000):
         self.host = host
         self.port = port
+        self.thread_pool = []
 
     def start_server(self):
         """ Starts a TCP Server to handle http requests"""
@@ -18,12 +21,24 @@ class TCPServer():
 
         print("Started server at ", self.server_socket.getsockname())
 
-        while True:
-            connection_socket, addr = self.server_socket.accept()
-            data = connection_socket.recv(2048)
+        try:
+            while True:
+                connection_socket, addr = self.server_socket.accept()
 
-            self.handle_request(data, connection_socket)
-            connection_socket.close()
+                th = Thread(target=self.handle_clients, args=(connection_socket,))
+                th.start()
+                self.thread_pool.append(th)
+        except KeyboardInterrupt:
+            print(" Exiting...")
+        finally:
+            print("DEBUG: Thread Count: ", len(self.thread_pool))
+            for _th in self.thread_pool:
+                _th.join()
+        
+    def handle_clients(self, connection_socket):
+        data = connection_socket.recv(2048)
+        self.handle_request(data, connection_socket)
+        connection_socket.close()
 
     def handle_request(self, data, connection_socket):
         """Incoming Ruquest handler. For generating response

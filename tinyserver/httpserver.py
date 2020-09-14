@@ -17,7 +17,7 @@ class HTTPRequest():
 
     def parse(self, data):
         data_lines = data.split('\r\n')
-        self.parse_request_line(data_lines[0])
+        if data_lines[0]: self.parse_request_line(data_lines[0])
 
     def parse_request_line(self, req_line):
         request_info = req_line.split(' ')
