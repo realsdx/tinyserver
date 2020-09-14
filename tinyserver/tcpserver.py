@@ -1,4 +1,5 @@
 import socket
+import errno
 
 from threading import Thread
 
@@ -36,9 +37,14 @@ class TCPServer():
                 _th.join()
         
     def handle_clients(self, connection_socket):
-        data = connection_socket.recv(2048)
-        self.handle_request(data, connection_socket)
-        connection_socket.close()
+        try:
+            data = connection_socket.recv(2048)
+            self.handle_request(data, connection_socket)
+        except BrokenPipeError:
+            print("ERROR: Broken Pipe error")
+        finally:
+            connection_socket.close()
+
 
     def handle_request(self, data, connection_socket):
         """Incoming Ruquest handler. For generating response

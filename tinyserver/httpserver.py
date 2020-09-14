@@ -57,12 +57,13 @@ class HTTPServer(TCPServer):
         request = HTTPRequest(data)
         try:
             handler = getattr(self, 'handle_%s' % request.method)
+            status_line, headers, body = handler(request)
+            connection_socket.sendall(status_line)
+            connection_socket.sendall(headers)
+            if body: connection_socket.sendall(body)
         except AttributeError:
-            print("Not Implemented")
-        status_line, headers, body = handler(request)
-        connection_socket.sendall(status_line)
-        connection_socket.sendall(headers)
-        if body: connection_socket.sendall(body)
+            print("DEBUG: [%s] Method Not Implemented" %request.method)
+
 
     def handle_GET(self, request):
         filename = request.URI.strip('/')
