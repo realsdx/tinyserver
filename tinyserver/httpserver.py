@@ -66,6 +66,8 @@ class HTTPServer(TCPServer):
 
     def handle_GET(self, request):
         filename = request.URI.strip('/')
+        if not filename:
+            filename = 'index.html'
         filepath = os.path.abspath(WEB_DIR+filename)
 
         if os.path.exists(filepath):

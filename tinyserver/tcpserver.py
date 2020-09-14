@@ -1,6 +1,6 @@
 import socket
 
-REQUEST_QUEUE_SIZE = 1
+REQUEST_QUEUE_SIZE = 5
 
 
 class TCPServer():
