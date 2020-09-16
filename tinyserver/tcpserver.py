@@ -3,7 +3,7 @@ import errno
 
 from threading import Thread
 
-REQUEST_QUEUE_SIZE = 5
+REQUEST_QUEUE_SIZE = 25
 
 
 class TCPServer():
@@ -11,12 +11,14 @@ class TCPServer():
         self.host = host
         self.port = port
         self.thread_pool = []
+        self.file_cache = {}
 
     def start_server(self):
         """ Starts a TCP Server to handle http requests"""
 
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         self.server_socket.bind((self.host, self.port))
         self.server_socket.listen(REQUEST_QUEUE_SIZE)
 
@@ -26,22 +28,16 @@ class TCPServer():
             while True:
                 connection_socket, addr = self.server_socket.accept()
 
-                th = Thread(target=self.handle_clients, args=(connection_socket,))
-                th.start()
-                self.thread_pool.append(th)
+                Thread(target=self.handle_clients, args=(connection_socket,)).start()
         except KeyboardInterrupt:
             print(" Exiting...")
-        finally:
-            print("DEBUG: Thread Count: ", len(self.thread_pool))
-            for _th in self.thread_pool:
-                _th.join()
         
     def handle_clients(self, connection_socket):
         try:
             data = connection_socket.recv(2048)
             self.handle_request(data, connection_socket)
-        except BrokenPipeError:
-            print("ERROR: Broken Pipe error")
+        except (BrokenPipeError, ConnectionResetError):
+            print("ERROR: Client connection lost")
         finally:
             connection_socket.close()
 

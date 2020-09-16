@@ -1,9 +1,10 @@
 from .tcpserver import TCPServer
 import os
 import mimetypes
+import threading
 
 WEB_DIR = 'html/'
-
+mutex_lock = threading.Lock()
 
 class HTTPRequest():
     def __init__(self, data):
@@ -55,14 +56,15 @@ class HTTPServer(TCPServer):
 
     def handle_request(self, data, connection_socket):
         request = HTTPRequest(data)
-        try:
+        try: 
             handler = getattr(self, 'handle_%s' % request.method)
             status_line, headers, body = handler(request)
             connection_socket.sendall(status_line)
             connection_socket.sendall(headers)
             if body: connection_socket.sendall(body)
+            
         except AttributeError:
-            print("DEBUG: [%s] Method Not Implemented" %request.method)
+            print("ERROR: [%s] Method Not Implemented in %s" %(request.method, threading.current_thread().name))
 
 
     def handle_GET(self, request):
@@ -75,13 +77,25 @@ class HTTPServer(TCPServer):
             status_line = self.response_status_line(200)
             content_type = mimetypes.guess_type(filepath)[0] or 'text/html'
 
-            with open(filepath, 'rb') as f:
-                file_data = f.read()
+            # Check in cache
+            body = self.file_cache.get(filepath)
+
+            if not body:
+                with open(filepath, 'rb') as f:
+                    file_data = f.read()
+                    file_size = len(file_data)/1024                  
+
                 if content_type == "text/html":
                     body = file_data.decode().encode(
                         'utf-8')  # decode from binary, encode to utf-8
                 else:
                     body = file_data
+                
+                # Now put body content in the cache
+                if file_size <= 512:
+                    with mutex_lock:
+                        self.file_cache[filepath] = body
+                        print("DEBUG: Cached ", filepath)
 
             extra_headers = {
                 'Content-Type': content_type,
