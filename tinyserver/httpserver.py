@@ -34,7 +34,8 @@ class HTTPServer(TCPServer):
     status_codes = {200: 'OK', 404: 'Not Found', 501: 'Not Implemented'}
     headers = {'Server': 'Tiny Server', 'Connection': 'close'}
 
-    def __init__(self, host='127.0.0.1', port=5000):
+    def __init__(self, host='127.0.0.1', port=5000, web_dir=None):
+        self.web_dir = web_dir if (web_dir != None) else WEB_DIR
         super().__init__(host, port)
 
     def response_status_line(self, status_code):
