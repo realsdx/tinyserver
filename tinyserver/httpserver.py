@@ -27,7 +27,7 @@ class HTTPRequest():
         self.http_version = request_info[2]
 
     def parse_headers(self):
-        pass
+        pass #TODO
 
 
 class HTTPServer(TCPServer):
@@ -57,6 +57,7 @@ class HTTPServer(TCPServer):
 
     def handle_request(self, data, connection_socket):
         request = HTTPRequest(data)
+        print("DEBUG\n, ", data, "\n")
         try: 
             handler = getattr(self, 'handle_%s' % request.method)
             status_line, headers, body = handler(request)
@@ -111,7 +112,7 @@ class HTTPServer(TCPServer):
         return status_line.encode(), headers.encode(), body
 
     def handle_OPTIONS(self, request):
-        status_line = self.response_status_line(200)
+        status_line = self.response_status_line(204)
         allow_header = {'Allow': 'OPTIONS, GET'}
         headers = self.response_headers(allow_header)
 
