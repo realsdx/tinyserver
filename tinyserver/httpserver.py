@@ -3,7 +3,7 @@ import os
 import mimetypes
 import threading
 
-WEB_DIR = 'html/'
+WEB_DIR = 'example_html/'
 mutex_lock = threading.Lock()
 
 class HTTPRequest():
