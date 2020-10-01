@@ -11,7 +11,6 @@ class TCPServer():
         self.host = host
         self.port = port
         self.thread_pool = []
-        self.file_cache = {}
 
     def start_server(self):
         """ Starts a TCP Server to handle http requests"""
@@ -47,3 +46,5 @@ class TCPServer():
         Override this in the HTTPServer subclass"""
 
         return "Empty Response"
+
+# TODO: https://github.com/python/cpython/blob/bd0a08ea90e4c7a2ebf29697937e9786d4d8e5ee/Lib/socketserver.py#L631
