@@ -1,7 +1,15 @@
 # TinyServer
-### This is a tiny HTTP server written in Python
+### This is a simple static HTTP web server written in Python
 
 It provides minimal HTTP server to serve simple HTML pages
+
+## Features
+- Content Cahing
+- Gzip compression
+- No dependencies!
+- Native TLS encryption #TODO
+- Diretory listing #TODO
+- Byte-serving for large files #TODO
 
 ## Screenshots
 TinyServer in action
@@ -27,5 +35,4 @@ Start the server in default port 5000
 python main.py
 ```
 
-### I made this to learn about HTTP Servers.
-#### Not intended for actual use.
+*This server is for serving static files only. Not for production use cases*
