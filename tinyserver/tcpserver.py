@@ -17,12 +17,12 @@ class TCPServer():
         self.selector.register(conn, selectors.EVENT_READ, self.read_client)
 
     def read_client(self, conn, mask):
-        data = conn.recv(1024)
-        if data:
-            try:
+        try:
+            data = conn.recv(1024)
+            if data:
                 self.handle_request(data, conn)
-            except (BrokenPipeError, ConnectionResetError):
-                print("Error: Clinet connection lost")
+        except (BrokenPipeError, ConnectionResetError):
+            print("Error: Clinet connection lost")
         
         self.selector.unregister(conn)
         conn.close()
