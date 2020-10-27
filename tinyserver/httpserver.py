@@ -25,7 +25,6 @@ class HTTPRequest():
 
     def parse_request_line(self, req_line):
         request_info = req_line.split(' ')
-        print("DEBUG: ", request_info, threading.current_thread().name)
         self.method = request_info[0]
         self.URI = request_info[1]
         self.http_version = request_info[2]
@@ -82,8 +81,7 @@ class HTTPServer(TCPServer):
             if body: connection_socket.sendall(body)
             
         except AttributeError as e:
-            print("ERROR: [%s] Method Not Implemented in %s" %(request.method, threading.current_thread().name))
-            # print("DEBUG:", e)
+            print("ERROR: [%s] Method Not Implemented" %(request.method))
 
 
     def handle_GET(self, request):
